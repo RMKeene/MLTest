@@ -1,5 +1,5 @@
-Richard Keene
-3/12/2020
+
+3/12/2020 - Richard Keene
 
 LOG of work thought and process:
 
@@ -21,4 +21,10 @@ on-the-fly if not already done.
 - Setup Flask, copied in standard REST example code.  Modified to naming for my project
 - Got all working with Postman
 - Got SQLite3 downloaded.
-- Mad ethe database init code.
+- Made the database init code.
+
+3/13/2020 - COVID-19 gets serious in America. Friday the Thirteenth?
+- Got all 4 tables into SQLite3 from CSVs.  
+- Got auto-load code working to setup and load to db if not already loaded.
+- One can just delete keene.db to force a data reload.
+- Now to think about actual algorithms......

@@ -9,15 +9,6 @@ app = Flask(__name__)
 api = Api(app)
 parser = reqparse.RequestParser()
 
-STUDENTS = {
-    '1': {'name': 'Mark', 'age': 23, 'spec': 'math'},
-    '2': {'name': 'Jane', 'age': 20, 'spec': 'biology'},
-    '3': {'name': 'Peter', 'age': 21, 'spec': 'history'},
-    '4': {'name': 'Kate', 'age': 22, 'spec': 'science'},
-}
-
-# Get database set up if not already set up.
-mydb.init_mydb()
 
 class StudentsList(Resource):
     def get(self):
@@ -41,4 +32,11 @@ class StudentsList(Resource):
 api.add_resource(StudentsList, '/students/')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Get database set up if not already set up.
+    conn: sqlite3.Connection = mydb.init_mydb()
+    mydb.load_csvs_to_db(conn)
+    mydb.close_db(conn)
+    conn = None
+
+    app.run(debug=True, use_reloader=False)
+
