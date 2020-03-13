@@ -29,6 +29,7 @@ MANIFEST
 
 # Pluralsight files.  These are from the tar.gzip file.
 data_files_ml_engineer
+keene.db
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
