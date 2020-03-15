@@ -1,12 +1,13 @@
 import sqlite3
 import csv
 
+db_connection_string: str = "keene.db";
 
 def init_mydb():
     # Get database set up if not already set up.
     conn = None
     try:
-        conn: sqlite3.Connection = sqlite3.connect("keene.db")
+        conn: sqlite3.Connection = sqlite3.connect(db_connection_string)
         print('SQLite Version: ' + sqlite3.version)
         conn.execute("""CREATE TABLE IF NOT EXISTS 'course_tags' (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,6 +47,11 @@ def init_mydb():
     return conn
 
 
+def open_db() -> sqlite3.Connection:
+    conn: sqlite3.Connection = sqlite3.connect(db_connection_string)
+    return conn
+
+
 def close_db(conn: sqlite3.Connection):
     if conn:
         conn.close()
@@ -56,7 +62,7 @@ def debug_table(conn, tablename):
         in the table. """
     rowcount = 0
     cur = conn.cursor()
-    for row in cur.execute('SELECT * FROM course_tags').fetchall():
+    for row in cur.execute(f'SELECT * FROM {tablename}').fetchall():
         rowcount += 1
         if rowcount > 5:
             break
@@ -70,7 +76,7 @@ def load_csvs_to_db(conn: sqlite3.Connection):
         assert len(row) == 1
     if row[0] != 0:
         cur.close()
-        print("Already loaded the csv files, skipping. (You can delete keene.db to force this to reload.)");
+        print(f"Already loaded the csv files, skipping. (You can delete {db_connection_string} to force this to reload.)");
         return
 
     print("Loading course tags to DB.")
