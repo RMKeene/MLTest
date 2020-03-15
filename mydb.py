@@ -70,6 +70,15 @@ def debug_table(conn, tablename):
     cur.close()
 
 
+def strip_quotes_str(s: str) -> str:
+    """ The csv parser does not strip quotes, so brute force it. """
+    return s.replace("'", "").replace('"', '')
+
+
+def strip_quotes_tuple(tup: tuple) -> tuple:
+    return tuple([strip_quotes_str(x) for x in tup])
+
+
 def load_csvs_to_db(conn: sqlite3.Connection):
     cur = conn.cursor()
     for row in cur.execute('SELECT COUNT(*) FROM course_tags').fetchall():
@@ -90,6 +99,7 @@ def load_csvs_to_db(conn: sqlite3.Connection):
                 skip = False
                 continue
             # print(', '.join(row))
+            row = strip_quotes_tuple(row)
             cur.execute('INSERT INTO course_tags(course_id, course_tags) VALUES (?, ?)', tuple(row))
             rowcount += 1
             # print(cur.lastrowid)
@@ -109,6 +119,7 @@ def load_csvs_to_db(conn: sqlite3.Connection):
                 skip = False
                 continue
             # print(', '.join(row))
+            row = strip_quotes_tuple(row)
             cur.execute("""INSERT INTO 
                 user_assessment_scores(user_handle, assessment_tag, user_assessment_date, user_assessment_score) 
                 VALUES (?, ?, ?, ?)""", tuple(row))
@@ -130,6 +141,7 @@ def load_csvs_to_db(conn: sqlite3.Connection):
                 skip = False
                 continue
             # print(', '.join(row))
+            row = strip_quotes_tuple(row)
             cur.execute("""INSERT INTO 
                 user_course_views(user_handle, view_date, course_id, author_handle, level, view_time_seconds) 
                 VALUES (?, ?, ?, ?, ?, ?)""", tuple(row))
@@ -151,6 +163,7 @@ def load_csvs_to_db(conn: sqlite3.Connection):
                 skip = False
                 continue
             # print(', '.join(row))
+            row = strip_quotes_tuple(row)
             cur.execute("""INSERT INTO 
                 user_interests(user_handle, interest_tag, date_followed) 
                 VALUES (?, ?, ?)""", tuple(row))

@@ -44,6 +44,23 @@ on-the-fly if not already done.
 - CS vs. Art vs. Animation vs. game vs. web vs. other skill categories.
 
 3/15/2020 - Implementation
-- Decided to do K-Mean clustering on courses vs interests.
+- Decided to do a score on courses vs interests. 
 - Got REST working better.  More readable JSON output so easier on future developers.
-
+- Hmmmmmmm, "calculate a score that represents similarity between users". This could be anything
+   from trivial grouping to complex AI with learned weighting between groups.  Just a matter of 
+   how much time to put into this exercise.  Going to KISS it. (Keep it Simple Stupid™)
+- Courses vs Interests.  Lets make this a ranking of how many course key words match interest key words. Where 0 is a
+  user that has no commonality of interests to courses, and 1.0 is heavy match.  This may reveal
+  some grouping or maybe a spectrum of users that are 'normal' vs. 'strange' Or maybe 
+  people that are changing career? Or forced to take training by their employer?
+- Could do a fancy SQL Join and do the whole thing in on SQL statement, but I want control over the 
+  way interest and course tags are compared.  So will instead do it explicitly.  And, hey, CPU cycles are
+  free here at home.
+- Got correlation going.  Very very slow code.  Lots of loops on database queries.  Would be way faster to preload
+  all the table data into ram and crunch it. But if zillions of users maybe not, so then partition the problem 
+  or pre-crunch the data into correlated sets.
+  
+Results:
+- Ok, got results.  Users have a score on how much commonality there is between their 
+  stated interests and the courses they take.
+-
