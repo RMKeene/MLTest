@@ -62,5 +62,6 @@ on-the-fly if not already done.
   
 Results:
 - Ok, got results.  Users have a score on how much commonality there is between their 
-  stated interests and the courses they take.
+  stated interests and the courses they take. Many are 0.0.  Some are in the 0.5 range.
+  Math is common interest count / (total interest count + 1) 
 -

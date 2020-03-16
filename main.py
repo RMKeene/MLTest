@@ -48,54 +48,68 @@ def get_user_interests(userid, maxrecs):
     return ret
 
 
-@app.route('/courses_vs_interests_scores/<int:maxrecs>', methods=['GET'])
-def generate_courses_vs_interests_scores(maxrecs):
-    # Expects http://127.0.0.1:5000/courses_vs_interests_scores/1000 where the 2 is user id, 10 is record limit.
+@app.route('/compare_user_interests_and_courses/<int:usr1>/<int:usr2>', methods=['GET'])
+def compare_user_interests_and_courses(usr1, usr2):
+    # Expects http://127.0.0.1:5000/compare_user_interests_and_courses/1/3 being 2 user handles.
+    return compare_user_interests_and_courses_impl(usr1, usr2)
+
+
+def fetch_course_tags(cur, user_courses):
+    course_tags = {}
+    for course in user_courses:
+        for row in cur.execute('SELECT * FROM course_tags WHERE course_id = ?', [course]).fetchall():
+            # uid, course_id, course_tags
+            # Just build dict of unique tags.
+            course_tags[row[2]] = row
+    return course_tags
+
+
+def fetch_interest_tags(cur, userid):
+    interest_tags = {}
+    for row in cur.execute('SELECT * FROM user_interests WHERE user_handle = ?', [userid]).fetchall():
+        # uid, user_handle, interest_tag, date_followed
+        interest_tags[row[2]] = row
+        pass
+    return interest_tags
+
+
+def fetch_user_courses(cur, userid):
+    user_courses = {}
+    for row in cur.execute('SELECT * FROM user_course_views WHERE user_handle = ?', [userid]).fetchall():
+        # uid, user_handle, view_date, course_id, author_handle, level, view_time_seconds
+        # We will ignore summing view_time_seconds for now.  Not the immediate issue at hand.
+        user_courses[row[3]] = row
+    return user_courses
+
+
+def compare_user_interests_and_courses_impl(usr1, usr2):
     c: sqlite3.Connection = mydb.open_db()
 
     ret = []
 
     # get list of user ids
     cur = c.cursor()
-    userids = []
-    for row in cur.execute('SELECT DISTINCT user_handle FROM user_interests LIMIT ?',
-                           [maxrecs]).fetchall():
-        userids.append(row[0])
 
-    for userid in userids:
-        # get courses a user takes
-        user_courses = {}
-        for row in cur.execute('SELECT * FROM user_course_views WHERE user_handle = ?', [userid]).fetchall():
-            # uid, user_handle, view_date, course_id, author_handle, level, view_time_seconds
-            # We will ignore summing view_time_seconds for now.  Not the immediate issue at hand.
-            user_courses[row[3]] = row
-        # Get union of all course tags
-        course_tags = {}
-        for course in user_courses:
-            for row in cur.execute('SELECT * FROM course_tags WHERE course_id = ?', [course]).fetchall():
-                # uid, course_id, course_tags
-                # Just build dict of unique tags.
-                course_tags[row[2]] = row
+    user_courses1 = fetch_user_courses(cur, usr1)
+    course_tags1 = fetch_course_tags(cur, user_courses1)
+    interest_tags1 = fetch_interest_tags(cur, usr1)
+    user_courses2 = fetch_user_courses(cur, usr2)
+    course_tags2 = fetch_course_tags(cur, user_courses2)
+    interest_tags2 = fetch_interest_tags(cur, usr2)
 
-        # get interests of a user.
-        interest_tags = {}
-        for row in cur.execute('SELECT * FROM user_interests WHERE user_handle = ?', [userid]).fetchall():
-            # uid, user_handle, interest_tag, date_followed
-            interest_tags[row[2]] = row
-            pass
+    # How common are their interests?
+    common_tags = {}
+    # Ugly order squared :-(.  Converting these to numeric interest keys would be faster.
+    # Better yet convert to numerics then use numpy or TensorFlow to correlate in GPU if needed.
+    for user_interest1 in interest_tags1:
+        for user_interest2 in interest_tags2:
+            if user_interest1 == user_interest2:
+                common_tags[user_interest1] = user_interest1
+    # So the count could be an absolute metric of commonality. Or as a ratio of total interests vs. common.
 
-        # Now correlate.  Lets try counting common terms, simple string compare for now.
-        common_tags = {}
-        for user_interest in interest_tags:
-            if user_interest in course_tags:
-                common_tags[user_interest] = user_interest
-
-        ret.append({'user_handle': userid,
-                    'user_score': float(len(common_tags)) /
-                                  (len(interest_tags) + len(course_tags) - len(common_tags) + 1.0) ,
-                    'common_tags': [*common_tags],
-                    'user_interest_count': len(interest_tags),
-                    'course_tag_count': len(course_tags)})
+    ret.append({'user_handle1': usr1, 'user_handle2': usr2,
+                'user_score': len(common_tags),
+                'common_tags': [*common_tags]})
 
     mydb.close_db(c)
 
