@@ -64,4 +64,11 @@ Results:
 - Ok, got results.  Users have a score on how much commonality there is between their 
   stated interests and the courses they take. Many are 0.0.  Some are in the 0.5 range.
   Math is common interest count / (total interest count + 1) 
--
+- Re-did the computing to do a simple count of two user's interests.
+
+Further Ideas:
+- So for a job interview programming test this is about it. Could study this problem for a year and 
+  have way better ideas. (See above list, Thoughts)
+  Either neural net correlation or other deep learning could get better results.  
+  Parsing the intertest tags more intelligently would help too.
+  
