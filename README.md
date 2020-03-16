@@ -72,3 +72,40 @@ Further Ideas:
   Either neural net correlation or other deep learning could get better results.  
   Parsing the intertest tags more intelligently would help too.
   
+ Final Words:
+ From the pdf assignment doc...
+- Tell us about your similarity calculation and why you chose it.
+   * It was straight forward.  More thought and months would result in way more sophisticated code.
+- We have provided you with a relatively small sample of users. At true scale, the
+number of users, and their associated behavior, would be much larger. What
+considerations would you make to accommodate that?
+    * Many aspects could be improced
+    * Unit Tests
+    * Load data once from the DB, then pre-crunch to very compact forms.
+    * Load as one huge tensor and then use tensorflow and numpy on it
+    * Do data visualization for better comprehension
+    * For very large data sets, in the billions of records, preprocess into groups that are more bite-size.
+    * Go massively parallel. (I've been through this process before with medical data.)
+- Given the context for which you might assume an API like this would be used, is
+there anything anything else you would think about? (e.g. other data you would
+like to collect)
+    * The additional data depends on the goals.  There are several obvious possible goals:
+        * Maximize Revenue
+        * Maximize learning from classes
+        * Maximize the user's career
+        * Maximize site traffic
+        * Maximize other company's interest if educating their employees
+    * The REST API approach is amenable to other programs getting results.  This is typically a
+      single page NodeJS app in the browser.
+    * A Unreal Engine graphical/GPU approach for visualization is useful for looking at large 
+      volumes of data in VR.  Not just blowing smoke here. I worked at The VOID and developed games in Unreal.
+    * A phone app approach would let use have online courses on the phone.
+    * As far as other data in general: The course tags and interests need to be encoded beyond their surface forms.
+      E.g. Convert tags to integer unique values, and then have some semantic relationships so tags like
+      java and Certified Java Developer can compare as nearly equal in some sense. (By surface forms I
+      mean to say "Hello", "Hola", "Здравствуйте", "howdy", "Hi", "Salutations" are 
+      all surface forms of the underlying concept of saying hello in a given grammatical context; 
+      but would be encoded as a unique number.)
+    * Such grammar can be parsed out with a LSTM approach.
+    * Any data one can collect can contribute to the learning in a system, even in ways not at all anticipated.
+
